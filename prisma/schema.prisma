@@ -1,0 +1,31 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  addressId String?  @unique @db.ObjectId // adicionar @unique para 1:1
+  address   Address? @relation(fields: [addressId], references: [id]) // define a relação com Address
+  posts     Post[]
+}
+
+model Address {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  street String
+  city   String
+  user   User? // campo inverso da relação 1:1
+}
+
+model Post {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  title  String
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+}
